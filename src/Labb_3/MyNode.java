@@ -10,17 +10,17 @@ public class MyNode extends DefaultMutableTreeNode{
     private String level;
     private String text;
 
+    public MyNode(Object userObject, boolean allowsChildren, String level, String text) {
+        super(userObject, allowsChildren);
+        this.level = level;
+        this.text = text;
+    }
+
     public String getLevelString() {
         return level;
     }
 
     public String getTextString() {
         return text;
-    }
-
-    public MyNode(Object userObject, boolean allowsChildren, String level, String text) {
-        super(userObject, allowsChildren);
-        this.level = level;
-        this.text = text;
     }
 }

@@ -1,18 +1,30 @@
 package Labb_3;
+
 import javax.swing.*;
-import javax.swing.tree.*;
-import java.io.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.NoSuchElementException;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class DirTreeE2 extends JFrame implements ActionListener {
+public class DirTreeC extends JFrame implements ActionListener {
+    private static final String CLOSE_STRING = " Close ";
+    private static final String SHOW_STRING = " Show Details ";
 
-    public DirTreeE2() {
-        Container c = getContentPane();
-        //*** Build the tree and a mouse listener to handle clicks
-        //root = new DefaultMutableTreeNode(katalog);
+    private String xmlLine;
+    private Scanner scan;
+    private JCheckBox box;
+    private JTree tree;
+    private DefaultMutableTreeNode root;
+    private DefaultTreeModel treeModel;
+    private JPanel controls;
+
+    public DirTreeC() {
+        Container myContainer = getContentPane();
+        /* Build the tree and a mouse listener to handle clicks */
         buildTree();
         treeModel = new DefaultTreeModel( root );
         tree = new JTree( treeModel );
@@ -25,38 +37,37 @@ public class DirTreeE2 extends JFrame implements ActionListener {
                     }
                 };
         tree.addMouseListener( ml );
-        //*** build the tree by adding the nodes
 
-        //*** panel the JFrame to hold controls and the tree
+        /* panel the JFrame to hold controls and the tree */
         controls = new JPanel();
-        box = new JCheckBox( showString );
-        init(); //** set colors, fonts, etc. and add buttons
-        c.add( controls, BorderLayout.NORTH );
-        c.add( tree, BorderLayout.CENTER );
-        setVisible( true ); //** display the framed window
+        box = new JCheckBox(SHOW_STRING);
+        init(); // set colors, fonts, etc. and add buttons
+        myContainer.add( controls, BorderLayout.NORTH );
+        myContainer.add( tree, BorderLayout.CENTER );
+        setVisible( true ); // display the framed window
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public void actionPerformed( ActionEvent e ) {
-        String cmd = e.getActionCommand();
-        if ( cmd.equals( closeString ) )
+        String command = e.getActionCommand();
+        if ( command.equals(CLOSE_STRING) )
             dispose();
     }
 
     private void init() {
         tree.setFont( new Font( "Dialog", Font.BOLD, 12 ) );
         controls.add( box );
-        addButton( closeString );
+        addButton(CLOSE_STRING);
         controls.setBackground( Color.lightGray );
         controls.setLayout( new FlowLayout() );
         setSize( 400, 400 );
     }
 
     private void addButton( String n ) {
-        JButton b = new JButton( n );
-        b.setFont( new Font( "Dialog", Font.BOLD, 12 ) );
-        b.addActionListener( this );
-        controls.add( b );
+        JButton button = new JButton( n );
+        button.setFont( new Font( "Dialog", Font.BOLD, 12 ) );
+        button.addActionListener( this );
+        controls.add( button );
     }
 
     private MyNode readNode() {
@@ -110,6 +121,7 @@ public class DirTreeE2 extends JFrame implements ActionListener {
             try {
                 root = readNode();
             } catch (Exception e) {
+                System.out.println("Something was wrong with the file: ");
                 System.out.println(e);
                 System.exit(0);
             }
@@ -119,62 +131,26 @@ public class DirTreeE2 extends JFrame implements ActionListener {
         }
     }
 
-    private void buildTree( File f, DefaultMutableTreeNode parent) {
-        DefaultMutableTreeNode child =
-                new DefaultMutableTreeNode( f.toString() );
-        parent.add(child);
-        if ( f.isDirectory() ) {
-            String list[] = f.list();
-            for ( int i = 0; i < list.length; i++ )
-                buildTree( new File(f,list[i]), child);
-        }
-    }
-
-    private void showDetails( TreePath p ) {
-        if ( p == null )
+    private void showDetails( TreePath path ) {
+        if ( path == null )
             return;
-        MyNode theNode = (MyNode)p.getLastPathComponent();
-        JOptionPane.showMessageDialog( this, theNode.getLevelString() + ": " + theNode + theNode.getTextString());
+        MyNode theNode = (MyNode)path.getLastPathComponent();
+        String chainString = " men allt som är " + theNode;
+        MyNode iterNode = theNode;
+        while (iterNode.getParent()!=null) {
+            chainString = chainString + " är " + iterNode.getParent();
+            iterNode = (MyNode)iterNode.getParent();
+        }
+        if (theNode.getParent()==null) {     // för att det ska bli något vettigt när man klickar på liv
+            chainString = chainString + " lever!";
+        }
+        JOptionPane.showMessageDialog( this, theNode.getLevelString() + ": " + theNode + theNode.getTextString() + chainString);
     }
 
-    private String getAttributes( File f ) {
-        String t = "";
-        if ( f.isDirectory() )
-            t += "Directory";
-        else
-            t += "Nondirectory file";
-        t += "\n   ";
-        if ( !f.canRead() )
-            t += "not ";
-        t += "Readable\n   ";
-        if ( !f.canWrite() )
-            t += "not ";
-        t += "Writeable\n  ";
-        if ( !f.isDirectory() )
-            t += "Size in bytes: " + f.length() + "\n   ";
-        else {
-            t += "Contains files: \n     ";
-            String[ ] contents = f.list();
-            for ( int i = 0; i < contents.length; i++ )
-                t += contents[ i ] + ", ";
-            t += "\n";
-        }
-        return t;
-    }
 
     public static void main( String[ ] args ) {
-        if(args.length>0) katalog=args[0];
-        new DirTreeE2();
+        new DirTreeC();
     }
 
-    private String xmlLine;
-    private Scanner scan;
-    private JCheckBox box;
-    private JTree tree;
-    private DefaultMutableTreeNode root;
-    private DefaultTreeModel treeModel;
-    private JPanel controls;
-    private static String katalog="Liv";
-    private static final String closeString = " Close ";
-    private static final String showString = " Show Details ";
+
 }
