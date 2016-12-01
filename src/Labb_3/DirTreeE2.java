@@ -70,7 +70,7 @@ public class DirTreeE2 extends JFrame implements ActionListener {
         lineScan.next();
         String nameString = lineScan.next();
 
-        String name = nameString;//.substring(6, nameString.length()-2);m    FIXA
+        String name = nameString;
         lineScan.useDelimiter(">");
         lineScan.next();
         if(!lineScan.hasNext()){
@@ -88,7 +88,7 @@ public class DirTreeE2 extends JFrame implements ActionListener {
                 if (xmlLine.equals("</"+startTag+">")) {
                     return retNode;
                 } else {
-                    System.out.println("Something was wrong with the fileasd");
+                    System.out.println("Something was wrong with the file");
                     System.exit(0);
                 }
             } else if (xmlLine.startsWith("<")) {
@@ -106,7 +106,7 @@ public class DirTreeE2 extends JFrame implements ActionListener {
             scan.next();
             scan.next();    // hoppar förbi <?xml version="1.0" encoding="UTF-8"?>
             xmlLine = scan.nextLine();
-            //System.out.println(xmlLine);
+
             try {
                 root = readNode();
             } catch (Exception e) {

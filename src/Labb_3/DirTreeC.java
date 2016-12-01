@@ -28,7 +28,7 @@ public class DirTreeC extends JFrame implements ActionListener {
         buildTree();
         treeModel = new DefaultTreeModel( root );
         tree = new JTree( treeModel );
-        MouseListener ml =
+        MouseListener mouseListener =
                 new MouseAdapter() {
                     public void mouseClicked( MouseEvent e ) {
                         if ( box.isSelected() )
@@ -36,7 +36,7 @@ public class DirTreeC extends JFrame implements ActionListener {
                                     e.getY() ) );
                     }
                 };
-        tree.addMouseListener( ml );
+        tree.addMouseListener( mouseListener );
 
         /* panel the JFrame to hold controls and the tree */
         controls = new JPanel();
@@ -78,17 +78,29 @@ public class DirTreeC extends JFrame implements ActionListener {
         startTag = lineScan.next().substring(1);
 
         lineScan.useDelimiter("\"");
-        lineScan.next();
-        String nameString = lineScan.next();
 
-        String name = nameString;//.substring(6, nameString.length()-2);m    FIXA
-        lineScan.useDelimiter(">");
-        lineScan.next();
-        if(!lineScan.hasNext()){
+        if (!lineScan.next().equals(" namn=")) {         // om det inte står " namn="
             System.out.println("Something was wrong with the file");
             System.exit(0);
         }
-        String text = lineScan.next();
+
+        String nameString = lineScan.next();
+
+        String name = nameString;
+        lineScan.useDelimiter(">");
+        if(!lineScan.next().equals("\"")) {           // om det är fel på citattecknena
+            System.out.println("Something was wrong with the file");
+            System.exit(0);
+        }
+
+        if(!lineScan.hasNext()){          // om det inte står någon text efter
+            System.out.println("Something was wrong with the file");
+            System.exit(0);
+        }
+
+        String text = lineScan.nextLine();    //   tar resten av raden
+        text = text.substring(1);     //  tar bort >-tecken
+
 
 
         MyNode retNode = new MyNode(name, true, startTag, text);
@@ -99,7 +111,7 @@ public class DirTreeC extends JFrame implements ActionListener {
                 if (xmlLine.equals("</"+startTag+">")) {
                     return retNode;
                 } else {
-                    System.out.println("Something was wrong with the fileasd");
+                    System.out.println("Something was wrong with the file");
                     System.exit(0);
                 }
             } else if (xmlLine.startsWith("<")) {
